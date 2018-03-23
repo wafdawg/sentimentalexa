@@ -1,7 +1,7 @@
 "use strict";
 
 var Alexa = require("alexa-sdk");
-var http = require("http");
+var https = require("https");
 var APP_ID = "";
 var SKILL_NAME = "Get Sentiment Analysis"
 //Setup
@@ -33,20 +33,7 @@ var tone_analyzer = new ToneAnalyzerV3(
         version_date: '2017-09-21'
     });
 
-var testtone = "init";
 
-
-/***************************************************/
-/*
-function testing()
-{
-    console.log('inside function');
-    console.log(testtone);
-
-}
-
-testing();
-*/
 
 exports.handler = function (event, context, callback) {
     var alexa = Alexa.handler(event, context);
@@ -56,6 +43,8 @@ exports.handler = function (event, context, callback) {
 
 
 }
+
+
 
 var handlers = {
     'LaunchRequest': function () {
@@ -67,68 +56,90 @@ var handlers = {
     'sad': function () {
         this.emit('GetSadSentimentAnalysis');
     },
+    
     'GetSentimentAnalysis': function () {
         /************************************************** */
+
+        //Initialize IBM Watson API Call
+        var inputText = encodeURI("yes! I made it to my dream college");
+        console.log(inputText);
+        var pathText = '/tone-analyzer/api/v3/tone?version=2017-09-21&text=' + inputText;
+        console.log(pathText);
         var options = {
-            host: 'api.open-notify.org',
-            port: 80,
-            method: 'GET',
-            path: '/astros.json'
+            host: 'gateway.watsonplatform.net',
+
+            // auth: {
+            //             'user': '922e4390-6e26-4b48-90bc-589edced86b5',
+            //             'pass': 'Sp38ijlfjbbg'
+            //         },
+            headers: { 'Authorization': 'Basic OTIyZTQzOTAtNmUyNi00YjQ4LTkwYmMtNTg5ZWRjZWQ4NmI1OlNwMzhpamxmamJiZw==' },
+            //headers: {'Authorization': "Basic " + new Buffer('922e4390-6e26-4b48-90bc-589edced86b5:Sp38ijlfjbbg').toString()},
+            path: pathText,
+            method: 'GET'
         }
-        var req = http.request(options, res => {
+        var req = https.request(options, res => {
             res.setEncoding('utf8');
             var returnData = "";
             res.on('data', chunk => {
                 returnData = returnData + chunk;
             });
 
-            res.on('end',() => {
-                var result = "Great you are happy!" + JSON.stringify(returnData);
-               console.log(result);
-               this.emit(":tellWithCard", result, SKILL_NAME, "result");        
+            res.on('end', () => {
+                var strOutput = JSON.stringify(returnData);
+                var str = strOutput.replace("\\","");
+                
+                var obj = JSON.parse(returnData);
+                
+                 console.log(obj.document_tone.tones[0]);
+                 var result = "I hope you are always this happy!" + "Tone: " + obj.document_tone.tones[0].tone_name + "Score: " + obj.document_tone.tones[0].score ;
+                this.emit(":tellWithCard",result, SKILL_NAME, "result");
             });
         });
         req.end();
-        /***************************************************/
-        
-        var sentimentAnalysis = "Hello from Alexa";
-
-        //Output
-        var speechOutput = sentimentAnalysis;
-
 
 
 
     },
+
+
+
     'GetSadSentimentAnalysis': function () {
         /************************************************** */
+        var inputText = encodeURI("I broke up with my boyfriend today.");
+        console.log(inputText);
+        var pathText = '/tone-analyzer/api/v3/tone?version=2017-09-21&text=' + inputText;
+        console.log(pathText);
         var options = {
-            host: 'api.open-notify.org',
-            port: 80,
-            method: 'GET',
-            path: '/astros.json'
+            host: 'gateway.watsonplatform.net',
+
+            // auth: {
+            //             'user': '922e4390-6e26-4b48-90bc-589edced86b5',
+            //             'pass': 'Sp38ijlfjbbg'
+            //         },
+            headers: { 'Authorization': 'Basic OTIyZTQzOTAtNmUyNi00YjQ4LTkwYmMtNTg5ZWRjZWQ4NmI1OlNwMzhpamxmamJiZw==' },
+            //headers: {'Authorization': "Basic " + new Buffer('922e4390-6e26-4b48-90bc-589edced86b5:Sp38ijlfjbbg').toString()},
+            path: pathText,
+            method: 'GET'
         }
-        var req = http.request(options, res => {
+        var req = https.request(options, res => {
             res.setEncoding('utf8');
             var returnData = "";
             res.on('data', chunk => {
                 returnData = returnData + chunk;
             });
 
-            res.on('end',() => {
-                var result = "Sorry, you are sad!" + JSON.stringify(returnData);
-               console.log(result);
-               this.emit(":tellWithCard", result, SKILL_NAME, "result");        
+            res.on('end', () => {
+                var strOutput = JSON.stringify(returnData);
+                var str = strOutput.replace("\\","");
+                
+                
+                var obj = JSON.parse(returnData);
+                console.log(strOutput);
+                var result = "You sound sad, don't worry, let me play a song for you." + "Tone: " + obj.document_tone.tones[0].tone_name + "Score: " + obj.document_tone.tones[0].score ;
+               this.emit(":tellWithCard",result, SKILL_NAME, "result");
             });
         });
         req.end();
-        /***************************************************/
-        
-        var sentimentAnalysis = "Hello from Alexa";
-
-        //Output
-        var speechOutput = sentimentAnalysis;
-
 
 
 
@@ -150,3 +161,6 @@ var handlers = {
     },
 
 }
+
+
+
