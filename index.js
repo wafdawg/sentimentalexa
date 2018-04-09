@@ -37,7 +37,9 @@ var handlers = {
             //             'user': '922e4390-6e26-4b48-90bc-589edced86b5',
             //             'pass': 'Sp38ijlfjbbg'
             //         },
-            headers: { 'Authorization': 'Basic OTIyZTQzOTAtNmUyNi00YjQ4LTkwYmMtNTg5ZWRjZWQ4NmI1OlNwMzhpamxmamJiZw==' },
+            //headers: { 'Authorization': 'Basic OTIyZTQzOTAtNmUyNi00YjQ4LTkwYmMtNTg5ZWRjZWQ4NmI1OlNwMzhpamxmamJiZw==' },
+            headers: { 'Authorization': 'Basic MTM4Nzc0NjktN2MzNy00MDkwLTlhNTgtZDE0ZTUwZTRmYmNjOmVScld3UFY3cTVXWA==' },
+            
             path: pathText,
             method: 'GET'
         }
